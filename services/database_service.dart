@@ -70,21 +70,17 @@ class DatabaseService {
     });
   }
 
-  void updateBook({int isbn, Book updatedBook}) {
-    Firestore.instance.runTransaction((transaction) async {
-      var matchedBooks = await bookCollection
-          .where('isbn', isEqualTo: isbn)
-          .limit(1)
-          .getDocuments();
+  Future<bool> updateBook(
+      {@required String bookDocID, @required Book updatedBook}) async {
+    bool success = true;
 
-      // Check if there is any match
-      if (matchedBooks.documents.length > 0) {
-        // If there's a match, update the book.
-        Book bookToUpdate = Book.fromMap(matchedBooks.documents[0].data);
-
-        var newBook = Book.updateBook(bookToUpdate, updatedBook);
-      }
+    await Firestore.instance.runTransaction((transaction) async {
+      var bookSnap = await transaction.get(bookCollection.document(bookDocID));
+      await transaction.set(bookSnap.reference, updatedBook.toMap());
+    }).catchError((e) {
+      success = false;
     });
+    return success;
   }
 
   Future<bool> updateBorrower(

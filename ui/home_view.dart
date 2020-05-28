@@ -20,6 +20,7 @@ class _HomeViewState extends State<HomeView> {
         title: Text(widget.title),
       ),
       /*
+      To add sample books
       floatingActionButton: FloatingActionButton(onPressed: () {
         var data = jsonDecode(Book.sampleBooks);
         List<Map<String, dynamic>> books =
@@ -32,7 +33,7 @@ class _HomeViewState extends State<HomeView> {
       }),
       */
       floatingActionButton: FancyFab(color: Theme.of(context).primaryColor),
-      body: getBookList(context),
+      body: getBody(context),
       bottomNavigationBar: BottomAppBar(
         child: Container(
           height: 64,
@@ -55,7 +56,80 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget getBookList(BuildContext context) {
+  Widget getBody(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            'Welcome!',
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+          ),
+          StreamBuilder(
+              stream: DatabaseService.instance.bookCollection.snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.data == null) {
+                  return Center(child: Text('ERROR'));
+                } else {
+                  return Container(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Icon(
+                              Icons.book,
+                              size: 48,
+                            ),
+                            Text(
+                              snapshot.data.documents.length.toString() +
+                                  ' books in library',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }),
+          StreamBuilder(
+              stream: DatabaseService.instance.borrowerCollection.snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.data == null) {
+                  return Center(child: Text('ERROR'));
+                } else {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(
+                            Icons.person,
+                            size: 48,
+                          ),
+                          Text(
+                            snapshot.data.documents.length.toString() +
+                                ' borrowers',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              })
+        ],
+      ),
+    );
+
     return StreamBuilder<QuerySnapshot>(
         stream: DatabaseService.instance.bookCollection.snapshots(),
         builder: (context, snapshot) {
@@ -64,6 +138,31 @@ class _HomeViewState extends State<HomeView> {
           } else if (snapshot.data == null) {
             return Center(child: Text('ERROR'));
           } else {
+            return Center(
+              child: Container(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Welcome!'),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Icon(Icons.book),
+                              Text(snapshot.data.documents.length.toString() +
+                                  ' books in library'),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  )),
+            );
+
+            /*
             return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
@@ -74,6 +173,7 @@ class _HomeViewState extends State<HomeView> {
                     subtitle: Text('ISBN: ' + book.isbn.toString()),
                   );
                 });
+            */
           }
         });
   }

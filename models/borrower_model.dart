@@ -34,3 +34,18 @@ class Borrower extends Equatable{
   @override
   List<Object> get props => [name, surname, borrowDate, borrowDueDate];
 }
+
+/*
+Sample
+{
+      "name": "Burak",
+      "surname": "Ömer",
+      "borrowDate": 1589204129254,
+      "borrowDueDate": 1589403600000,
+      "books": [
+            "0hOtuqTJOOpxzWZGpv2O",
+            "7WFCBJijOUF3pa9YUj3D",
+            "NOfqMOZAYk3kaKtsPORo"
+      ]
+}
+*/
